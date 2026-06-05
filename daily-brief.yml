@@ -1,0 +1,46 @@
+name: Daily Brief Agent
+
+on:
+  # ── Scheduled run ──────────────────────────────────────────────────────────
+  # Runs every weekday at 7:00 AM UTC (adjust to your timezone below).
+  # Cron syntax: minute  hour  day-of-month  month  day-of-week
+  #   day-of-week: 1=Monday … 5=Friday
+  # Common UTC offsets to help you adjust:
+  #   US Eastern  UTC-5 (EST) / UTC-4 (EDT)  →  7 AM ET = 12:00 UTC
+  #   US Pacific  UTC-8 (PST) / UTC-7 (PDT)  →  7 AM PT = 15:00 UTC
+  #   UK          UTC+0 (GMT) / UTC+1 (BST)  →  7 AM UK =  7:00 UTC (winter) / 6:00 UTC (summer)
+  schedule:
+    - cron: "0 7 * * 1-5" # 7:00 AM UTC, Monday–Friday
+
+  # ── Manual trigger (useful for testing) ────────────────────────────────────
+  workflow_dispatch:
+
+jobs:
+  run-agent:
+    name: Run Daily Brief Agent
+    runs-on: ubuntu-latest # Free tier runner
+
+    steps:
+      # 1. Check out your repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Node.js (tsx requires Node 18+)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Run the agent
+      #    Secrets are injected from your repo's Settings → Secrets and Variables → Actions
+      - name: Run agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: npm start

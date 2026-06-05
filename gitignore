@@ -1,0 +1,14 @@
+# Environment variables — NEVER commit this
+.env
+
+# Dependencies
+node_modules/
+
+# TypeScript build output
+dist/
+
+# Editor / OS noise
+.DS_Store
+*.log
+.vscode/
+.idea/
